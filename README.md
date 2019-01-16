@@ -2,5 +2,5 @@ The repo contains c program to find number of times a string occurs in a file an
 
 #### Commands to run the c file
 
-1. make
-2. ./count <<Search string>> <<input file>> <<output file>>
+1. `make`
+2. `./count <Search string> <input file> <output file>`
