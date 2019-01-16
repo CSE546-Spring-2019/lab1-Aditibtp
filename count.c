@@ -1,3 +1,9 @@
+/*
+delete pointer refrences
+change file pointers to binary mode
+*/
+
+
 #include <stdio.h>
 #include <string.h>
 
@@ -153,13 +159,13 @@ int kmpNumMathes(const char* searchString) {
 	return count;
 }
 
-FileData* passFileBuffers(char* searchString) {
+FileData* passFileBuffers(char* searchString, char* inputFile) {
 
 	unsigned int bufferSize = 100;
 	int count = 0;
 	FileData *fileData = (FileData*)malloc(sizeof(FileData));
 
-	FILE *filePtr = fopen("example3", "r");
+	FILE *filePtr = fopen(inputFile, "r");
 
 	if (filePtr == NULL) {
 		printf("Issue in opening the input file\n");
@@ -187,9 +193,9 @@ FileData* passFileBuffers(char* searchString) {
 		}
 		else {
 
-			printf("buf size: ", bufSize);
+			//printf("buf size: ", bufSize);
 			size_t read = fread(fileBuf, bufSize, 1, filePtr);
-			printf("%s\n", fileBuf);
+			//printf("%s\n", fileBuf);
 			//printf("reading file 3\n");
 			//fileBuf[bufSize-1] = '\0';
 			//printf("reading file2\n");
@@ -221,7 +227,7 @@ FileData* passFileBuffers(char* searchString) {
 			count = count + countSearchStringMatches(searchString, preSufSearchSpace);
 		}
 		prevBufferSuffix = fileBuf;
-
+		free(fileBuf);
 	}
 
 	fileData->fileSize = ftell(filePtr);
@@ -286,14 +292,14 @@ int fileIO(const char* searchString) {
 	return count;
 }
 
-int writeOutputToFile(FileData* fileData, char* searchString) {
+int writeOutputToFile(FileData* fileData, char* searchString, char* outputFile) {
 	FILE * wFilePtr;
 
 	int fileLength = snprintf(NULL, 0, "File size is: %d \nNumber of occurences of \"%s\": %d\n", fileData->fileSize, searchString, fileData->stringOccurenceNum);
 	printf("%d\n", fileLength);
 	char *writeBuffer = (char*)malloc(sizeof(char)*(fileLength + 1));
 	snprintf(writeBuffer, fileLength + 1, "File size is: %d \nNumber of occurences of \"%s\": %d\n", fileData->fileSize, searchString, fileData->stringOccurenceNum);
-	wFilePtr = fopen("sharma_863", "a");
+	wFilePtr = fopen(outputFile, "a");
 
 	if (wFilePtr == NULL) {
 		perror("Error opening/creating file: ");
@@ -307,37 +313,38 @@ int writeOutputToFile(FileData* fileData, char* searchString) {
 }
 
 int main() {
-	printf("Hey there i am in visual studio!!\n");
-	char searchString[] = "potato";
+
+	int outputWritten = 0;
+	char searchString[100] = "potato";
+	char inputFile[100];
+	char outputFile[100];
 
 	int k = 0;
 	int count = 0;
 
-	/*for (int i = k; i < searchSpaceLen-searchLen; i++) {
+	printf("Enter seach string:  ");
+	scanf("%s", searchString);
 
-		char *subStr = (char*)malloc(searchLen);
-		strncpy(subStr, searchSpace + i, searchLen);
-		subStr[searchLen] = '\0';
+	printf("Enter input file name: ");
+	scanf("%s", inputFile);
 
-		printf("String here %s\n", subStr);
-		if (strcmp(searchString, subStr) == 0) {
-			count++;
-			k = i + searchLen+1;
-		}
-	}*/
+	printf("Enter output file name: ");
+	scanf("%s", outputFile);
 
-	//Starting reading file from here
-	//count = fileIO(searchString);
 
-	//using kmp algorithm O(n) to find string matches
-	//count = kmpNumMathes(searchString);
-
-	FileData *fileData = passFileBuffers(searchString);
-
-	//function to write data to new file
-	writeOutputToFile(fileData, searchString);
+	FileData *fileData = passFileBuffers(searchString, inputFile);
 
 	printf("There are %d %s in the file", fileData->stringOccurenceNum, searchString);
+
+	//function to write data to new file
+	outputWritten = writeOutputToFile(fileData, searchString, outputFile);
+
+	if (outputWritten) {
+		printf("Output succesfully written at %s", outputFile);
+	}
+	else {
+		printf("Some error occured");
+	}
 
 	return 0;
 }
